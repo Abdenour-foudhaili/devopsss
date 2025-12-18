@@ -1,6 +1,5 @@
 package tn.esprit.studentmanagement.services;
 
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tn.esprit.studentmanagement.repositories.EnrollmentRepository;
@@ -9,8 +8,9 @@ import java.util.List;
 
 @Service
 public class EnrollmentService implements IEnrollment {
+
     @Autowired
-    EnrollmentRepository enrollmentRepository;
+    private EnrollmentRepository enrollmentRepository;
 
     @Override
     public List<Enrollment> getAllEnrollments() {
@@ -18,8 +18,8 @@ public class EnrollmentService implements IEnrollment {
     }
 
     @Override
-    public Enrollment getEnrollmentById(Long idEnrollment) {
-        return enrollmentRepository.findById(idEnrollment).get();
+    public Enrollment getEnrollmentById(Long id) {
+        return enrollmentRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class EnrollmentService implements IEnrollment {
     }
 
     @Override
-    public void deleteEnrollment(Long idEnrollment) {
-enrollmentRepository.deleteById(idEnrollment);
+    public void deleteEnrollment(Long id) {
+        enrollmentRepository.deleteById(id);
     }
 }

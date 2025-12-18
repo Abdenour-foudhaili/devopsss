@@ -8,10 +8,10 @@ import tn.esprit.studentmanagement.repositories.DepartmentRepository;
 import java.util.List;
 
 @Service
-
 public class DepartmentService implements IDepartmentService {
+
     @Autowired
-    DepartmentRepository departmentRepository;
+    private DepartmentRepository departmentRepository;
 
     @Override
     public List<Department> getAllDepartments() {
@@ -19,8 +19,8 @@ public class DepartmentService implements IDepartmentService {
     }
 
     @Override
-    public Department getDepartmentById(Long idDepartment) {
-        return departmentRepository.findById(idDepartment).get();
+    public Department getDepartmentById(Long id) {
+        return departmentRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class DepartmentService implements IDepartmentService {
     }
 
     @Override
-    public void deleteDepartment(Long idDepartment) {
-departmentRepository.deleteById(idDepartment);
+    public void deleteDepartment(Long id) {
+        departmentRepository.deleteById(id);
     }
 }

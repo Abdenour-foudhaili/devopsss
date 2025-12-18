@@ -1,0 +1,97 @@
+# ==========================================
+# PersistentVolume (PV)
+# Ressource de stockage disponible dans le cluster
+# ==========================================
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv
+  namespace: devops
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /data/mysql
+  storageClassName: standard
+
+---
+# ==========================================
+# PersistentVolumeClaim (PVC)
+# Demande de stockage faite par MySQL
+# ==========================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: devops
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard
+
+---
+# ==========================================
+# Deployment MySQL
+# Gère le Pod MySQL avec volume persistant
+# ==========================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "rootpassword"
+        - name: MYSQL_DATABASE
+          value: "studentdb"
+        - name: MYSQL_USER
+          value: "student"
+        - name: MYSQL_PASSWORD
+          value: "studentpassword"
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+
+---
+# ==========================================
+# Service MySQL (ClusterIP)
+# Permet à Spring Boot de se connecter à MySQL
+# via mysql-service:3306
+# ==========================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: devops
+spec:
+  type: ClusterIP
+  selector:
+    app: mysql
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306

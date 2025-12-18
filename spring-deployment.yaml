@@ -1,0 +1,78 @@
+# 1. ConfigMap - Configuration non sensible
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spring-config
+  namespace: devops
+data:
+  SPRING_DATASOURCE_URL: "jdbc:mysql://mysql-service:3306/studentdb?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true"
+
+---
+# 2. Secret - Credentials sensibles (encodés en Base64)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+  namespace: devops
+type: Opaque
+data:
+  # student (encodé en Base64)
+  MYSQL_USER: c3R1ZGVudA==
+  # studentpassword (encodé en Base64)
+  MYSQL_PASSWORD: c3R1ZGVudHBhc3N3b3Jk
+
+---
+# 3. Deployment Spring Boot
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-deployment
+  namespace: devops
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: spring-app
+  template:
+    metadata:
+      labels:
+        app: spring-app
+    spec:
+      containers:
+        - name: spring-container
+          image: foudhailiabdenour/student-management:latest
+          ports:
+            - containerPort: 8089
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: spring-config
+                  key: SPRING_DATASOURCE_URL
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
+
+---
+# 4. Service NodePort - Expose l'application
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-service
+  namespace: devops
+spec:
+  type: NodePort
+  selector:
+    app: spring-app
+  ports:
+    - protocol: TCP
+      port: 8089
+      targetPort: 8089
+      nodePort: 30080

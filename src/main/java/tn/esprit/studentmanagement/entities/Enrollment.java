@@ -10,24 +10,23 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@ToString(exclude = {"student", "course"})
 public class Enrollment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idEnrollment;
+    private Long id;
+
     private LocalDate enrollmentDate;
     private Double grade;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 
     @ManyToOne
+    @JoinColumn(name = "student_id")
     private Student student;
 
     @ManyToOne
+    @JoinColumn(name = "course_id")
     private Course course;
-
-
-
-
-
 }

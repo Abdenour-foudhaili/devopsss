@@ -12,15 +12,23 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 @AllArgsConstructor
 public class EnrollmentController {
-    IEnrollment enrollmentService;
+
+    private IEnrollment enrollmentService;
+
     @GetMapping("/getAllEnrollment")
-    public List<Enrollment> getAllEnrollment() { return enrollmentService.getAllEnrollments(); }
+    public List<Enrollment> getAllEnrollment() {
+        return enrollmentService.getAllEnrollments();
+    }
 
     @GetMapping("/getEnrollment/{id}")
-    public Enrollment getEnrollment(@PathVariable Long id) { return enrollmentService.getEnrollmentById(id); }
+    public Enrollment getEnrollment(@PathVariable Long id) {
+        return enrollmentService.getEnrollmentById(id);
+    }
 
     @PostMapping("/createEnrollment")
-    public Enrollment createEnrollment(@RequestBody Enrollment enrollment) { return enrollmentService.saveEnrollment(enrollment); }
+    public Enrollment createEnrollment(@RequestBody Enrollment enrollment) {
+        return enrollmentService.saveEnrollment(enrollment);
+    }
 
     @PutMapping("/updateEnrollment")
     public Enrollment updateEnrollment(@RequestBody Enrollment enrollment) {
@@ -29,5 +37,6 @@ public class EnrollmentController {
 
     @DeleteMapping("/deleteEnrollment/{id}")
     public void deleteEnrollment(@PathVariable Long id) {
-        enrollmentService.deleteEnrollment(id); }
+        enrollmentService.deleteEnrollment(id);
+    }
 }
